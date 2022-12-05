@@ -1,0 +1,47 @@
+body{
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow-x: hidden;
+}
+
+.side-bar{
+    min-height: 100vh;
+}
+
+a{
+    text-decoration: none !important;
+}
+.accounts-list > h3 {
+    cursor: pointer;
+}
+
+.accounts-list-body{
+    max-height: 300px;
+    overflow: auto;
+}
+
+.accounts-list-body thead{
+    position: sticky;
+    top: 0;
+}
+
+.dashboard-info{
+    max-width: 15% !important;
+    margin: 1rem;
+}
+
+.validator-log{
+    max-height: 500px;
+}
+
+.log-area{
+    max-height: 300px;
+}
+
+.options-col{
+    height: 100vh !important;
+    overflow: auto;
+}
+.toast-container{
+    z-index: 10000000000000000000000 !important;
+}
