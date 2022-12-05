@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Twitter API BY TPCT | {{ title }}</title>
+    <link href="/static/dashboard/base.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+    {% block head %} {% endblock %}
+</head>
+
+<body class="bg-light">
+
+    <div class="container-fluid g-0 d-flex">
+        <div class="col-md-2 border-end shadow-sm side-bar">
+            <div class="pt-2 justify-content-center sticky-top options-col">
+                <div class="container border-bottom pb-3 mb-2">
+                    <div class="user-info bg-white shadow-sm p-3 rounded-3 text-center mb-3">
+                        <h4>Welcome <span class="badge bg-primary">{{ current_user.username }}</span></h4>
+                        <h6><span class="badge bg-primary">{{ current_session.name }}</span></h6>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+                        {% if current_session %}
+                            <a href="{{ url_for('process.store', session_id=current_session.id)
+                                    if not current_session.active else url_for('process.delete',
+                                    session_id=current_session.id)}}"
+                               class="btn {{ "btn-primary" if not current_session.active else  "btn-danger" }}">
+                                {{ "Terminate" if current_session.active else "Start" }}</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <a class="border-bottom p-3 text-center d-block rounded-3 shadow-sm m-2 {% if request.endpoint == 'dashboard.index' %} bg-success text-light{% endif %}"
+                       href="{{ url_for('dashboard.index') }}">Dashboard</a>
+                    {% if is_admin %}
+                        <a class="border-bottom p-3 text-center d-block rounded-3 shadow-sm m-2 {% if request.endpoint == 'users.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('users.index') }}">Users</a>
+                    {% endif %}
+                    {% if current_session %}
+                        <a class="border-bottom p-3 text-center rounded-3 d-block shadow-sm m-2 {% if request.endpoint == 'accounts.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('accounts.index') }}">Accounts</a>
+                        <a class="border-bottom p-3 text-center rounded-3 d-block shadow-sm m-2 {% if request.endpoint == 'profile.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('profile.index') }}">Profile</a>
+                        <a class="border-bottom p-3 text-center rounded-3 d-block shadow-sm m-2 {% if request.endpoint == 'tweets.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('tweets.index') }}">Tweets</a>
+                        <a class="border-bottom p-3 text-center rounded-3 d-block shadow-sm m-2 {% if request.endpoint == 'reactions.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('reactions.index') }}">Reactions</a>
+                        <a class="border-bottom p-3 text-center rounded-3 d-block shadow-sm m-2 {% if request.endpoint == 'follow.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('follow.index') }}">Follow</a>
+                        <a class="border-bottom p-3 text-center rounded-3 d-block shadow-sm m-2 {% if request.endpoint == 'checker.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('checker.index') }}">Checker</a>
+                    {% endif %}
+                    {% if is_admin %}
+                        <a class="border-bottom p-3 text-center rounded-3 d-block shadow-sm m-2 {% if request.endpoint == 'dashboard_settings.index' %} bg-success text-light{% endif %}"
+                           href="{{ url_for('dashboard_settings.index') }}">Settings</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md p-5 pt-2 bg-white">
+            {% if current_session %}
+                <div class="row mb-3 d-flex justify-content-start bg-light rounded-3 border-bottom shadow-sm sticky-top p-3">
+                    {% if accounts_counters %}
+                        <div class="dashboard-info col-2 me-1 bg-white rounded shadow-sm d-flex flex-column align-items-start">
+                            <h4 class="pt-2">Accounts</h4>
+                            <div class="pt-2 pb-2">
+                                {% for key, count in accounts_counters.items() %}
+                                    <h6 class="text-success">{{ count }} {{ key }}</h6>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if follow_counters %}
+                        <div class="dashboard-info col-2 me-1 bg-white rounded shadow-sm d-flex flex-column align-items-start">
+                            <h4 class="pt-2">Accounts</h4>
+                            <div class="pt-2 pb-2">
+                                {% for key, count in follow_counters.items() %}
+                                    <h6 class="text-success">{{ count }} {{ key }}</h6>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if proxies_counter %}
+                        <div class="dashboard-info col-2 me-1 bg-white rounded shadow-sm d-flex flex-column align-items-start">
+                            <h4 class="pt-2">Proxies</h4>
+                            <div class="pt-2 pb-2">
+                                {% for key, count in proxies_counter.items() %}
+                                    <h6 class="text-success">{{ count }} {{ key }}</h6>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if status_counters %}
+                        {% for key, status_state in status_counters.items() %}
+                            <div class="dashboard-info col-2 me-1 bg-white rounded shadow-sm d-flex flex-column align-items-start">
+                                <h4 class="pt-2">{{ key }}</h4>
+                                <div class="pt-2 pb-2">
+                                    {% for key, count in status_state.items() %}
+                                        <h6 class="text-success">{{ count }} {{ key }}</h6>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% block main %}
+
+            {% endblock %}
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        {% for message in get_flashed_messages() %}
+            <div class="toast align-items-center bg-{{ message['type'] }}" role="alert" aria-live="assertive"
+                 aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ message['text'] }}
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+    <script src="/static/jquery.min.js" crossorigin="anonymous"></script>
+    <script>
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        toastElList.map(function (toastEl) {
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        })
+    </script>
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>

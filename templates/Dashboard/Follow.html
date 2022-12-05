@@ -1,0 +1,191 @@
+{% extends "Dashboard/Base.html" %}
+{% block head %}
+    <link rel="stylesheet" href="/static/dashboard/dashboard.css"/>
+{% endblock %}
+
+{% block main %}
+    <div class="row mb-3 d-flex justify-content-center flex-wrap">
+        <div class="accounts-list col mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+                    <h3 class="text-center text-success">To Be Followed Accounts List</h3>
+                    <div class="accounts-list-body mb-3">
+                        {% if not follow_counters['To Be Followed'] %}
+                            <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                                No Accounts To Be Followed
+                            </div>
+                        {% else %}
+                            <table class="table table-hover table-sm">
+                                <thead class="bg-white shadow-sm rounded-3">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for index, account_info in to_be_followed_accounts %}
+                                    <tr class="align-middle">
+                                        <form method="post"
+                                              action="{{ url_for('follow.deleteAccount', account_id=account_info['id']) }}">
+                                            <th scope="row">{{ index + 1 }}</th>
+                                            <td>{{ account_info['username'] }}</td>
+                                            <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                        </form>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                    {% if follow_counters['To Be Followed'] %}
+                        <div class="container d-flex justify-content-center">
+                            <form method="post" action="{{ url_for('follow.deleteToBeFollowed') }}">
+                                <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                                <a class="btn btn-success"
+                                   href="{{ url_for('follow.download', filename='to_be_followed', active=1, account_type='Followed') }}">Download
+                                    All</a>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+        <div class="accounts-list col mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+            <h3 class="text-center text-warning">Followers Accounts List</h3>
+            <div class="accounts-list-body">
+                {% if not follow_counters['Followers'] %}
+                    <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                        No Followers Accounts
+                    </div>
+                {% else %}
+                    <table class="table table-hover table-sm">
+                        <thead class="bg-white shadow-sm rounded-3">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for index, account_info in followers_accounts %}
+                            <tr class="align-middle">
+                                <form method="post"
+                                      action="{{ url_for('follow.deleteAccount', account_id=account_info['id']) }}">
+                                    <th scope="row">{{ index + 1 }}</th>
+                                    <td>{{ account_info['username'] }}</td>
+                                    <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                </form>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            {% if follow_counters['Followers'] %}
+                <div class="container d-flex justify-content-center">
+                    <form method="post" action="{{ url_for('follow.deleteFollowers') }}">
+                        <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                        <a class="btn btn-success"
+                           href="{{ url_for('follow.download', filename='followers', active=1, account_type='Follower') }}">Download
+                            All</a>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        <div class="accounts-list col mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+                <h3 class="text-center text-warning">Success To Be Followed</h3>
+                <div class="accounts-list-body">
+                    {% if not status_counters['Follow']['Success'] %}
+                        <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                            No Success Accounts
+                        </div>
+                    {% else %}
+                        <table class="table table-hover table-sm">
+                            <thead class="bg-white shadow-sm rounded-3">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, account_info in success_accounts %}
+                                <tr class="align-middle">
+                                    <form method="post"
+                                          action="{{ url_for('follow.deleteAccount', account_id=account_info['id']) }}">
+                                        <th scope="row">{{ index + 1 }}</th>
+                                        <td>{{ account_info['username'] }}</td>
+                                        <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                {% if  status_counters['Follow']['Success'] %}
+                    <div class="container d-flex justify-content-center">
+                        <form method="post" action="{{ url_for('follow.deleteFailed') }}">
+                            <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                            <a class="btn btn-success"
+                               href="{{ url_for('follow.download', filename='follow_failed',
+                               account_type='Followed', follow_failed=1) }}">Download
+                                All</a>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+    </div>
+    <div class="row mb-3 d-flex justify-content-center flex-wrap">
+        <div class="col d-flex flex-column justify-content-start flex-wrap shadow-sm rounded-3 bg-light border p-2">
+            <form method="post" action="{{ url_for('follow.store', session_id=current_session.id) }}"
+            enctype=multipart/form-data>
+                <div class="bg-white shadow-sm rounded-3 p-2">
+                    {{ followers_form.hidden_tag() }}
+                    <h6 class="text-center text-muted w-100 mb-2">Followers Worker Settings</h6>
+                    <div class="mb-3">
+                        <label class="form-label" for="accounts-file">Accounts To Be Followed</label>
+                        {{ followers_form.accounts_file(
+                                           id='accounts-file',
+                                           class='form-control',
+                                           placeholder='Account To Be Followed') }}
+                    </div>
+                    <div class="text-center d-flex justify-content-center flex-wrap align-items-center">
+                        <div class="form-floating mb-3 me-3">
+                            {{ followers_form.min_followers_count(id='min-followers-count', class='form-control',
+                                           placeholder='Min Followers Count', min=0, value=settings.min_follow_count) }}
+                            <label for="min-followers-count">Min Followers Count</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ followers_form.max_followers_count(id='max-followers-count', class='form-control',
+                                       placeholder='Max Followers Count', min=0, value=settings.max_follow_count) }}
+                            <label for="max-likes-count">Max Followers Count</label>
+                        </div>
+                        <div class="form-check form-switch ms-3">
+                            <input class="form-check-input"
+                                   name="notify"
+                                   value="notify" type="checkbox" role="switch"
+                                   id="notify" {{ 'checked' if settings.notify else '' }}>
+                            <label class="form-check-label"
+                                   for="notify">Notification</label>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-evenly">
+                        {{ followers_form.save(class="btn btn-success") }}
+                    </div>
+                </div>
+            </form>
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('follow.process') }}" class="btn btn-primary mt-3">Add Operation</a>
+                <a href="{{ url_for('follow.check') }}" class="btn btn-secondary ms-3 mt-3">Check</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            const accounts_list = $('.accounts-list');
+            $('.accounts-list-body').toggle();
+            accounts_list.find('h3').on('click', function () {
+                $(this).parent().find('div').first().toggle(100)
+            })
+        })
+    </script>
+{% endblock %}

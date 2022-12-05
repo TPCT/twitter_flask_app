@@ -1,0 +1,126 @@
+{% extends 'Dashboard/Base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="/static/dashboard/dashboard.css"/>
+{% endblock %}
+
+{% block main %}
+    <div class="row mb-3 d-flex justify-content-center flex-wrap">
+        <div class="col d-flex flex-column justify-content-start flex-wrap shadow-sm rounded-3 bg-light border p-2">
+            <form method="post" action="{{ url_for('dashboard_settings.store') }}"
+                  enctype=multipart/form-data>
+                <div class="bg-white shadow-sm rounded-3 p-2">
+                    {{ dashboard_settings_store_form.hidden_tag() }}
+                    <h6 class="text-center text-muted w-100 mb-2">Dashboard Settings</h6>
+
+                    <div class="row row-cols-2">
+                        <div class="col border-end mb-3 pb-3">
+                            <div class="mb-3">
+                                <label class="form-label" for="text-file">Texts File</label>
+                                {{ dashboard_settings_store_form.text_files(
+                                           id='text-file',
+                                           class='form-control',
+                                           placeholder='Text File') }}
+                            </div>
+                            <div class="d-flex flex-wrap border-bottom mb-3">
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.text_for_tweets(
+                                                class='form-check-input',
+                                                id='text-for-tweets',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-tweets">Tweets</label>
+                                </div>
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.text_for_quotes(
+                                                class='form-check-input',
+                                                id='text-for-quotes',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-quotes">Quotes</label>
+                                </div>
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.text_for_replies(
+                                                class='form-check-input',
+                                                id='text-for-replies',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-replies">Replies</label>
+                                </div>
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.text_for_bios(
+                                                class='form-check-input',
+                                                id='text-for-bios',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-bios">Bios</label>
+                                </div>
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.text_for_usernames(
+                                                class='form-check-input',
+                                                id='text-for-usernames',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-usernames">Usernames</label>
+                                </div>
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.text_for_countries(
+                                                class='form-check-input',
+                                                id='text-for-countries',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-countries">Countries</label>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                    {{ dashboard_settings_store_form.text_arabic(
+                                                class='form-check-input',
+                                                id='text-arabic',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-arabic">Arabic</label>
+                                </div>
+                        </div>
+                        <div class="col mb-3 pb-3">
+                            <div class="mb-3">
+                                <label class="form-label" for="text-file">Image Files</label>
+                                {{ dashboard_settings_store_form.images_file(
+                                           id='text-file',
+                                           class='form-control',
+                                           placeholder='Image Files', multiple=True) }}
+                            </div>
+                            <div class="d-flex">
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.images_for_tweets(
+                                                class='form-check-input',
+                                                id='image-for-tweets',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="image-for-tweets">Tweets</label>
+                                </div>
+                                <div class="form-check form-switch mb-3 me-4">
+                                    {{ dashboard_settings_store_form.images_for_profile_pictures(
+                                                class='form-check-input',
+                                                id='image-for-profile-picture',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-profile-picture">Profile Picture</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    {{ dashboard_settings_store_form.images_for_profile_covers(
+                                                class='form-check-input',
+                                                id='image-for-profile-covers',
+                                                role='switch') }}
+                                    <label class="form-check-label"
+                                           for="text-for-profile-covers">Profile Covers</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-evenly">
+                        {{ dashboard_settings_store_form.save(class="btn btn-success") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

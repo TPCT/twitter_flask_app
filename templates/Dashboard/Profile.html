@@ -1,0 +1,244 @@
+{% extends "Dashboard/Base.html" %}
+{% block head %}
+    <link rel="stylesheet" href="/static/dashboard/dashboard.css"/>
+{% endblock %}
+
+{% block main %}
+    <div class="row mb-3 d-flex justify-content-center flex-wrap">
+        <div class="col d-flex flex-column justify-content-start flex-wrap shadow-sm rounded-3 bg-light border p-2">
+            <form method="post" action="{{ url_for('profile.store', session_id=current_session.id) }}"
+                  enctype=multipart/form-data>
+                <div class="bg-white shadow-sm rounded-3 p-2">
+                    {{ profile_form.hidden_tag() }}
+                    <h6 class="text-center text-muted w-100 mb-2">Followers Worker Settings</h6>
+
+                    <div class="container-fluid border-bottom mb-3 pb-3">
+                        <div class="mb-3">
+                            <label class="form-label" for="covers-file">Cover Images</label>
+                            {{ profile_form.profile_covers_files(
+                                           id='covers-file',
+                                           class='form-control',
+                                           placeholder='Cover Images', multiple=True) }}
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            {{ profile_form.random_profile_covers(
+                                                class='form-check-input',
+                                                id='random-cover-images',
+                                                role='switch', checked=settings.random_cover_images) }}
+                            <label class="form-check-label"
+                                   for="random-cover-images">Random Cover Pictures</label>
+                        </div>
+                        {% if status_counters['Session Storage']['Profile Covers'] %}
+                            <input type="submit" class="btn btn-danger" value="Delete All" formmethod="POST" formaction="{{ url_for('profile.deleteCoverImages') }}"/>
+                        {% endif %}
+                    </div>
+
+                    <div class="container-fluid border-bottom pb-3 mb-3">
+                        <div class="mb-3">
+                            <label class="form-label" for="profile-images-file">Profile Images</label>
+                            {{ profile_form.profile_pictures_files(
+                                           id='profile-images-file',
+                                           class='form-control',
+                                           placeholder='Profile Images', multiple=True) }}
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            {{ profile_form.random_profile_pictures(
+                                                class='form-check-input',
+                                                id='random-profile-images',
+                                                role='switch', checked=settings.random_profile_images) }}
+                            <label class="form-check-label"
+                                   for="random-profile-images">Random Profile Pictures</label>
+                        </div>
+                        {% if status_counters['Session Storage']['Profile Pics'] %}
+                            <input type="submit" class="btn btn-danger" value="Delete All" formmethod="POST" formaction="{{ url_for('profile.deleteProfileImages') }}"/>
+                        {% endif %}
+                    </div>
+
+                    <div class="container-fluid border-bottom pb-3 mb-3">
+                        <div class="mb-3">
+                            <label class="form-label" for="countries-file">Countries File</label>
+                            {{ profile_form.countries_file(
+                                           id='countries-file',
+                                           class='form-control',
+                                           placeholder='Countries File') }}
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ profile_form.country_fixed(id='country-fixed-string', class='form-control',
+                                       placeholder='Country Text', value=settings.fixed_country_string) }}
+                            <label for="country-fixed-string">Country Text</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            {{ profile_form.random_countries(
+                                                class='form-check-input',
+                                                id='random-countries',
+                                                role='switch', checked=settings.random_countries) }}
+                            <label class="form-check-label"
+                                   for="random-countries">Random Countries</label>
+                        </div>
+                        {% if status_counters['Session Storage']['Countries'] %}
+                            <input type="submit" class="btn btn-danger" value="Delete All" formmethod="POST" formaction="{{ url_for('profile.deleteProfileCountries') }}"/>
+                        {% endif %}
+                    </div>
+
+                    <div class="container-fluid border-bottom pb-3 mb-3">
+                        <div class="mb-3">
+                            <label class="form-label" for="usernames-file">Usernames File</label>
+                            {{ profile_form.usernames_file(
+                                           id='usernames-file',
+                                           class='form-control',
+                                           placeholder='Usernames File', multiple=True) }}
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ profile_form.username_fixed(id='username-fixed-string', class='form-control',
+                                       placeholder='Username Text', value=settings.fixed_username_string) }}
+                            <label for="username-fixed-string">Username Text</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            {{ profile_form.random_usernames(
+                                                class='form-check-input',
+                                                id='random-usernames',
+                                                role='switch', checked=settings.random_usernames) }}
+                            <label class="form-check-label"
+                                   for="random-usernames">Random Usernames</label>
+                        </div>
+                        {% if status_counters['Session Storage']['Names'] %}
+                            <input type="submit" class="btn btn-danger" value="Delete All" formmethod="POST" formaction="{{ url_for('profile.deleteProfileNames') }}"/>
+                        {% endif %}
+                    </div>
+
+                    <div class="container-fluid border-bottom pb-3 mb-3">
+                        <div class="mb-3">
+                            <label class="form-label" for="bios-file">Bio File</label>
+                            {{ profile_form.profile_bio_files(
+                                           id='bios-file',
+                                           class='form-control',
+                                           placeholder='Bio File', multiple=True) }}
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ profile_form.profile_bio_fixed(id='bio-fixed-string', class='form-control',
+                                       placeholder='Username Text', value=settings.fixed_bio_string) }}
+                            <label for="bio-fixed-string">Bio Text</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            {{ profile_form.random_bios(
+                                                class='form-check-input',
+                                                id='random-bios',
+                                                role='switch', checked=settings.random_bios) }}
+                            <label class="form-check-label"
+                                   for="random-bios">Random Bio</label>
+                        </div>
+                        {% if status_counters['Session Storage']['Bios'] %}
+                            <input type="submit" class="btn btn-danger" value="Delete All" formmethod="POST" formaction="{{ url_for('profile.deleteBio') }}"/>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-evenly">
+                        {{ profile_form.save(class="btn btn-success") }}
+                    </div>
+                </div>
+            </form>
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('profile.process') }}" class="btn btn-primary mt-3">Add Operation</a>
+            </div>
+        </div>
+        <div class="col mb-3 d-flex flex-column justify-content-star">
+            <div class="accounts-list col mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+                <h3 class="text-center text-success">Active Accounts</h3>
+                <div class="accounts-list-body mb-3">
+                    {% if not accounts_counters['Active'] %}
+                        <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                            No Active Accounts
+                        </div>
+                    {% else %}
+                        <table class="table table-hover table-sm">
+                            <thead class="bg-white shadow-sm rounded-3">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, account_info in active_accounts %}
+                                <tr class="align-middle">
+                                    <form method="post"
+                                          action="{{ url_for('profile.deleteAccount', account_id=account_info['id']) }}">
+                                        <th scope="row">{{ index + 1 }}</th>
+                                        <td>{{ account_info['username'] }}</td>
+                                        <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                {% if accounts_counters['Active'] %}
+                    <div class="container d-flex justify-content-center">
+                        <form method="post"
+                              action="{{ url_for('profile.deleteAccounts', active=1, account_type='Profile') }}">
+                            <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                            <a class="btn btn-success"
+                               href="{{ url_for('profile.download', filename='active', active=1) }}">Download
+                                All</a>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="accounts-list col mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+                <h3 class="text-center text-warning">Suspended Accounts</h3>
+                <div class="accounts-list-body">
+                    {% if not accounts_counters['Suspended'] %}
+                        <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                            No Suspended Accounts
+                        </div>
+                    {% else %}
+                        <table class="table table-hover table-sm">
+                            <thead class="bg-white shadow-sm rounded-3">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, account_info in suspended_accounts %}
+                                <tr class="align-middle">
+                                    <form method="post"
+                                          action="{{ url_for('profile.deleteAccount', account_id=account_info['id']) }}">
+                                        <th scope="row">{{ index + 1 }}</th>
+                                        <td>{{ account_info['username'] }}</td>
+                                        <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                {% if accounts_counters['Suspended'] %}
+                    <div class="container d-flex justify-content-center">
+                        <form method="post"
+                              action="{{ url_for('profile.deleteAccounts', suspended=1) }}">
+                            <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                            <a class="btn btn-success"
+                               href="{{ url_for('profile.download', filename='suspended', active=0) }}">Download
+                                All</a>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            const accounts_list = $('.accounts-list');
+            $('.accounts-list-body').toggle();
+            accounts_list.find('h3').on('click', function () {
+                $(this).parent().find('div').first().toggle(100)
+            })
+            $('#bio-fixed-string').val('{{ settings.fixed_bio_string.strip() if settings.fixed_bio_string else '' }}');
+        })
+    </script>
+{% endblock %}

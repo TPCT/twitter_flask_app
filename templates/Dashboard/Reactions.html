@@ -1,0 +1,280 @@
+{% extends "Dashboard/Base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ stat }}"/>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        <div class="row mb-3 d-flex justify-content-center flex-wrap">
+            <div class="col d-flex flex-column justify-content-start flex-wrap shadow-sm rounded-3 bg-light border p-2">
+                <form method="post" action="{{ url_for('settings.store', session_id=current_session.id) }}">
+                    <div class="bg-white shadow-sm rounded-3 p-2">
+                        {{ settings_form.hidden_tag() }}
+                        <h6 class="text-center text-muted w-100 mb-2">Tweeting Worker Settings</h6>
+                        <div class="text-center row row-cols-2">
+                            <div class="col d-flex">
+                                <div class="form-floating mb-3 me-3">
+                                    {{ settings_form.min_likes_count(id='min-likes-count', class='form-control',
+                                           placeholder='Min Likes Count', min=0, value=settings.min_likes_count) }}
+                                    <label for="min-likes-count">Min Likes Count</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ settings_form.max_likes_count(id='max-likes-count', class='form-control',
+                                           placeholder='Max Likes Count', min=0, value=settings.max_likes_count) }}
+                                    <label for="max-likes-count">Max Likes Count</label>
+                                </div>
+                            </div>
+                            <div class="col d-flex">
+                                <div class="form-floating mb-3 me-3">
+                                    {{ settings_form.min_replies_count(id='min-replies-count', class='form-control',
+                                        placeholder='Min Replies Count', min=0, value=settings.min_replies_count) }}
+                                    <label for="min-replies-count">Min Replies Count</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ settings_form.max_replies_count(id='max-replies-count', class='form-control',
+                                        placeholder='Max Replies Count', min=0, value=settings.max_replies_count) }}
+                                    <label for="max-replies-count">Max Replies Count</label>
+                                </div>
+                            </div>
+                            <div class="col d-flex">
+                                <div class="form-floating mb-3 me-3">
+                                    {{ settings_form.min_quotes_count(id='min-quote-count', class='form-control',
+                                            placeholder='Min Quotes Count', min=0, value=settings.min_quotes_count) }}
+                                    <label for="min-quotes-count">Min Quotes Count</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ settings_form.max_quotes_count(id='max-quotes-count', class='form-control',
+                                            placeholder='Max Qutoes Count', min=0, value=settings.max_quotes_count) }}
+                                    <label for="max-quotes-count">Max Quotes Count</label>
+                                </div>
+                            </div>
+                            <div class="col d-flex">
+                                <div class="form-floating mb-3 me-3">
+                                    {{ settings_form.min_retweets_count(id='min-retweets-count', class='form-control',
+                                            placeholder='Min Retweets Count', min=0, value=settings.min_retweets_count) }}
+                                    <label for="min-retweets-count">Min Retweets Count</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ settings_form.max_retweets_count(id='max-retweets-count', class='form-control',
+                                            placeholder='Max Retweets Count', min=0, value=settings.min_retweets_count) }}
+                                    <label for="max-retweets-count">Max Retweets Count</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    {{ settings_form.tweets_time_sleep(id='tweets_time_sleep',
+                                        class='form-control',
+                                        placeholder='retweets time sleep',
+                                        min=0,
+                                        value=settings.tweets_time_sleep) }}
+                                    <label for="tweets_time_sleep">tweets Time Sleep</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    {{ settings_form.account_tweets_limit(id='account_tweets_limit',
+                                        class='form-control',
+                                        placeholder='account tweets limit',
+                                        min=1,
+                                        value=settings.account_tweets_limit) }}
+                                    <label for="account_tweets_limit">Account Tweets Limit</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-evenly">
+                            {{ settings_form.save(class="btn btn-success") }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col mb-3 d-flex flex-column justify-content-start">
+                <div class="accounts-list mt-3 me-2 shadow-sm d-flex flex-column p-3 border rounded-3">
+                    <h3 class="text-center text-success">Active Accounts List</h3>
+                    <div class="accounts-list-body mb-3">
+                        {% if not accounts_counters['Active'] %}
+                            <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                                No Active Accounts
+                            </div>
+                        {% else %}
+                            <table class="table table-hover table-sm">
+                                <thead class="bg-white shadow-sm rounded-3">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Permission</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for index, account_info in active_accounts %}
+                                    <tr class="align-middle">
+                                        <form method="post"
+                                              action="{{ url_for('reactions.deleteAccount', account_id=account_info['id']) }}">
+                                            <th scope="row">{{ index + 1 }}</th>
+                                            <td>{{ account_info['username'] }}</td>
+                                            <td>{{ account_info['account_type'] }}</td>
+                                            <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                        </form>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                    {% if accounts_counters['Active'] %}
+                        <div class="container d-flex justify-content-center">
+                            <form method="post" action="{{ url_for('reactions.deleteAccounts', active=1) }}">
+                                <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                                <a class="btn btn-success"
+                                   href="{{ url_for('reactions.download', filename='active_accounts', active=1, suspended=0, hidden=0) }}">Download
+                                    All</a>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="accounts-list mt-3 shadow-sm d-flex flex-column p-3 border rounded-3">
+                    <h3 class="text-center text-danger">Suspended Accounts List</h3>
+                    <div class="accounts-list-body">
+                        {% if not accounts_counters['Suspended'] %}
+                            <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                                No Locked Accounts
+                            </div>
+                        {% else %}
+                            <table class="table table-hover table-sm">
+                                <thead class="bg-white shadow-sm rounded-3">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Permission</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for index, account_info in suspended_accounts %}
+                                    <tr class="align-middle">
+                                        <form method="post"
+                                              action="{{ url_for('reactions.deleteAccount', account_id=account_info['id']) }}">
+                                            <th scope="row">{{ index + 1 }}</th>
+                                            <td>{{ account_info['username'] }}</td>
+                                            <td>{{ account_info['account_type'] }}</td>
+                                            <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                        </form>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                    {% if accounts_counters['Suspended'] %}
+                        <div class="container d-flex justify-content-center">
+                            <form method="post" action="{{ url_for('reactions.deleteAccounts', suspended=1) }}">
+                                <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                                <a class="btn btn-success"
+                                   href="{{ url_for('reactions.download', filename='suspended_accounts', suspended=1) }}">Download
+                                    All</a>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-2 mb-3">
+            <div class="col">
+                <div class="d-flex flex-column justify-content-center flex-wrap shadow-sm rounded-3 bg-light border p-2">
+                    <h4>Quotes</h4>
+                    <div class="row p-3">
+                        <div class="col bg-white rounded-3 shadow-sm p-2 border">
+                            <h6 class="text-center">Add Quotes</h6>
+                            <form class="d-flex flex-column align-items-center justify-content-start" method="post"
+                                  action="{{ url_for('quotes.store') }}" enctype=multipart/form-data>
+                                {{ quotes_form.hidden_tag() }}
+                                <div class="w-100 p-3">
+                                    <div class="mb-3">
+                                        <label for="quotes-file" class="form-label">Upload Quotes Text File</label>
+                                        {{ quotes_form.quotes_text(class_='form-control', id='quotes-file') }}
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        {{ quotes_form.fixed_quote_text(id='quote-text',
+                                            class_='form-control', default=settings.fixed_quote_string,
+                                            placeholder='text to be added to quote') }}
+                                        <label for="tweet-text">Quote Text</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        {{ quotes_form.random_quotes(
+                                                class='form-check-input',
+                                                id='random-quotes',
+                                                role='switch', checked=settings.random_quotes) }}
+                                        <label class="form-check-label"
+                                               for="random-quotes">Random Quotes</label>
+                                    </div>
+                                </div>
+                                {{ quotes_form.save(class="btn btn-success btn-sm m-2") }}
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row p-3">
+                        <form class="d-flex justify-content-center" method="post"
+                              action="{{ url_for('quotes.delete') }}">
+                            <input type="submit" class="btn btn-danger" value="Delete All"/>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="d-flex flex-column justify-content-center flex-wrap shadow-sm rounded-3 bg-light border p-2">
+                    <h4>Replies</h4>
+                    <div class="row p-3">
+                        <div class="col bg-white rounded-3 shadow-sm p-2 border">
+                            <h6 class="text-center">Replies To Add</h6>
+                            <form class="d-flex flex-column align-items-center justify-content-start" method="post"
+                                  action="{{ url_for('replies.store') }}" enctype=multipart/form-data>
+                                {{ replies_form.hidden_tag() }}
+                                <div class="w-100 p-3">
+                                    <div class="mb-3">
+                                        <label for="replies-file" class="form-label">Upload Replies Text File</label>
+                                        {{ replies_form.replies_text(class_='form-control', id='replies-file') }}
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        {{ replies_form.fixed_reply_text(
+                                            id='reply-text', class_='form-control',
+                                            placeholder='text to be added to replies') }}
+                                        <label for="tweet-text">Reply Text</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        {{ replies_form.random_replies(
+                                                class='form-check-input',
+                                                id='random-replies',
+                                                role='switch', checked=settings.random_replies) }}
+                                        <label class="form-check-label"
+                                               for="random-replies">Random Replies</label>
+                                    </div>
+                                </div>
+                                {{ replies_form.save(class="btn btn-success btn-sm m-2") }}
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row p-3">
+                        <form class="d-flex justify-content-center" method="post"
+                              action="{{ url_for('replies.delete') }}">
+                            <input type="submit" class="btn btn-danger" value="Delete All"/>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(function () {
+            const accounts_list = $('.accounts-list');
+            $('.accounts-list-body').toggle();
+            accounts_list.find('h3').on('click', function () {
+                $(this).parent().find('div').first().toggle(100)
+            });
+            $('#reply-text').val('{{ settings.fixed_reply_string.strip() if settings.fixed_reply_string else ''}}')
+            $('#quote-text').val('{{ settings.fixed_quote_string.strip() if settings.fixed_quote_string else ''}}')
+        })
+    </script>
+{% endblock %}

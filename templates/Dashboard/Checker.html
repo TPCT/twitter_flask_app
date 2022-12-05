@@ -1,0 +1,145 @@
+{% extends "Dashboard/Base.html" %}
+{% block head %}
+    <link rel="stylesheet" href="/static/dashboard/dashboard.css"/>
+{% endblock %}
+
+{% block main %}
+    <div class="row mb-3 d-flex justify-content-center flex-wrap">
+        <div class="accounts-list col mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+            <h3 class="text-center text-success">Active Accounts List</h3>
+            <div class="accounts-list-body mb-3">
+                {% if not active_accounts %}
+                    <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                        No Active Accounts
+                    </div>
+                {% else %}
+                    <table class="table table-hover table-sm">
+                        <thead class="bg-white shadow-sm rounded-3">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for index, account_info in active_accounts %}
+                            <tr class="align-middle">
+                                    <th scope="row">{{ index + 1 }}</th>
+                                    <td>{{ account_info['username'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            {% if active_accounts %}
+                <div class="container d-flex justify-content-center">
+                    <a class="btn btn-success" href="{{ url_for('checker.download', active=1, filename='active') }}">Download All</a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="accounts-list col mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+            <h3 class="text-center text-warning">Restricted Accounts List</h3>
+            <div class="accounts-list-body">
+                {% if not restricted_accounts %}
+                    <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                        No Restricted Accounts
+                    </div>
+                {% else %}
+                    <table class="table table-hover table-sm">
+                        <thead class="bg-white shadow-sm rounded-3">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for index, account_info in restricted_accounts %}
+                            <tr class="align-middle">
+                                    <th scope="row">{{ index + 1 }}</th>
+                                    <td>{{ account_info.username }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            {% if restricted_accounts %}
+                <div class="container d-flex justify-content-center">
+                    <a class="btn btn-success" href="{{ url_for('checker.download', restricted=1, filename='restricted') }}">Download All</a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="accounts-list col mt-3 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+            <h3 class="text-center text-danger">Suspended Accounts List</h3>
+            <div class="accounts-list-body">
+                {% if not suspended_accounts %}
+                    <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                        No Suspended Accounts
+                    </div>
+                {% else %}
+                    <table class="table table-hover table-sm">
+                        <thead class="bg-white shadow-sm rounded-3">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for index, account_info in suspended_accounts %}
+                            <tr class="align-middle">
+                                <th scope="row">{{ index + 1 }}</th>
+                                <td>{{ account_info['username'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+                {% if suspended_accounts %}
+                <div class="container d-flex justify-content-center">
+                    <a class="btn btn-success" href="{{ url_for('checker.download', suspended=1, filename='suspended') }}">Download All</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mb-3 d-flex justify-content-start flex-wrap">
+        <div class="col-6">
+            <div class="d-flex flex-column justify-content-center flex-wrap shadow-sm rounded-3 bg-light border p-2">
+                <h4>Accounts IN Database</h4>
+                <span class="text-warning text-wrap">Format: username:password:email</span>
+                <div class="row p-3">
+                    <div class="col bg-white rounded-3 shadow-sm p-2 border">
+                        <h6 class="text-center">Accounts To Add</h6>
+                        <form class="d-flex flex-column align-items-center justify-content-start" method="post"
+                              action="{{ url_for('checker.store') }}" enctype=multipart/form-data>
+                            {{ accounts_form.hidden_tag() }}
+                            <div class="w-100 p-3">
+                                <div class="mb-3">
+                                    <label for="accountsFile" class="form-label">Upload Accounts File To Be Saved</label>
+                                    {{ accounts_form.accounts_file(class_='form-control', id='accountsFile') }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="proxiesFile" class="form-label">Upload Proxy Files To Be Saved</label>
+                                    {{ accounts_form.proxies_file(class_='form-control', id='proxiesFile') }}
+                                </div>
+                            </div>
+                            {{ accounts_form.save(class="btn btn-success btn-sm m-2") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            const accounts_list = $('.accounts-list');
+            $('.accounts-list-body').toggle();
+            accounts_list.find('h3').on('click', function () {
+                $(this).parent().find('div').first().toggle(100)
+            })
+        })
+    </script>
+{% endblock %}

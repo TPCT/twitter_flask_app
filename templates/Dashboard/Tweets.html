@@ -1,0 +1,230 @@
+{% extends "Dashboard/Base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/dashboard/dashboard.css"/>
+{% endblock %}
+
+{% block main %}
+    <div class="row mb-3 d-flex justify-content-center flex-wrap">
+        <div class="col">
+            <div class="mb-3 d-flex flex-column justify-content-center flex-wrap shadow-sm rounded-3 bg-light border p-2">
+                <h4>Tweets Text IN Database</h4>
+                <div class="row p-3">
+                    <div class="col bg-white rounded-3 shadow-sm p-2 border">
+                        <h6 class="text-center">Tweets To Add</h6>
+                        <form class="d-flex flex-column align-items-center justify-content-start" method="post"
+                              action="{{ url_for('tweets.store') }}" enctype=multipart/form-data>
+                            {{ tweets_form.hidden_tag() }}
+                            <div class="w-100 p-3">
+                                <div class="mb-3">
+                                    <label for="tweets-text" class="form-label">Upload Tweets Text File</label>
+                                    {{ tweets_form.tweets_texts(class_='form-control', id='tweets-text', multiple=True) }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tweets-images" class="form-label">Upload Tweets Images</label>
+                                    {{ tweets_form.tweets_images(class_='form-control', id='tweets-images', multiple=True) }}
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ tweets_form.fixed_tweet_text(id='tweet-text',
+                                         class_='form-control',
+                                         placeholder='text to be added to tweet') }}
+                                    <label for="tweet-text">Tweet Text</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ tweets_form.alt_text(id='tweet-alt-text',
+                                         class_='form-control',
+                                         placeholder='alt text to be added to tweet') }}
+                                    <label for="tweet-alt-text">Tweet Alt Text</label>
+                                </div>
+                                <div class="row row-col-2 ps-3">
+                                    <div class="col form-check form-switch">
+                                        {{ tweets_form.random_tweets(
+                                                class='form-check-input',
+                                                id='random-tweets',
+                                                role='switch',
+                                                checked=settings.random_tweets) }}
+                                        <label class="form-check-label"
+                                               for="random-tweets">Random Tweets</label>
+                                    </div>
+                                    <div class="col form-check form-switch">
+                                        {{ tweets_form.random_images(
+                                                class='form-check-input',
+                                                id='random-images',
+                                                role='switch',
+                                                checked=settings.random_images) }}
+                                        <label class="form-check-label"
+                                               for="random-images">Random Images</label>
+                                    </div>
+                                     <div class="col form-check form-switch">
+                                        {{ tweets_form.is_arabic(
+                                                class='form-check-input',
+                                                id='tweet-is-arabic',
+                                                role='switch',
+                                                checked=settings.tweet_arabic) }}
+                                        <label class="form-check-label"
+                                               for="tweet-is-arabic">Arabic</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {{ tweets_form.save(class="btn btn-success btn-sm m-2") }}
+                        </form>
+                    </div>
+                </div>
+                <div class="row p-3">
+                    <form class="d-flex justify-content-center" method="post"
+                          action="{{ url_for('tweets.deleteTweets') }}">
+                        <input type="submit" class="btn btn-danger me-2" value="Delete All"/>
+                        <a href="{{ url_for('tweets.process') }}" class="btn btn-primary">Add Operation</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col mb-3 d-flex flex-column">
+            <div class="accounts-list mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+                <h3 class="text-center text-success">Active Accounts List</h3>
+                <div class="accounts-list-body mb-3">
+                    {% if not accounts_counters['Active'] %}
+                        <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                            No Active Accounts
+                        </div>
+                    {% else %}
+                        <table class="table table-hover table-sm">
+                            <thead class="bg-white shadow-sm rounded-3">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Permission</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, account_info in active_accounts %}
+                                <tr class="align-middle">
+                                    <form method="post"
+                                          action="{{ url_for('tweets.deleteAccount', account_id=account_info['id']) }}">
+                                        <th scope="row">{{ index + 1 }}</th>
+                                        <td>{{ account_info['username'] }}</td>
+                                        <td>{{ account_info['account_type'] }}</td>
+                                        <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                {% if accounts_counters['Active'] %}
+                    <div class="container d-flex justify-content-center">
+                        <form method="post" action="{{ url_for('tweets.deleteAccounts', active=1) }}">
+                            <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                            <a class="btn btn-success"
+                               href="{{ url_for('tweets.download', filename='active_accounts', active=1, suspended=0, hidden=0) }}">Download
+                                All</a>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="accounts-list mt-3 me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+                <h3 class="text-center text-warning">Search Ban Accounts List</h3>
+                <div class="accounts-list-body">
+                    {% if not accounts_counters['Hidden'] %}
+                        <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                            No Search Banned Accounts
+                        </div>
+                    {% else %}
+                        <table class="table table-hover table-sm">
+                            <thead class="bg-white shadow-sm rounded-3">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Permission</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, account_info in hidden_accounts %}
+                                <tr class="align-middle">
+                                    <form method="post"
+                                          action="{{ url_for('tweets.deleteAccount', account_id=account_info['id']) }}">
+                                        <th scope="row">{{ index + 1 }}</th>
+                                        <td>{{ account_info['username'] }}</td>
+                                        <td>{{ account_info['account_type'] }}</td>
+                                        <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                {% if accounts_counters['Hidden'] %}
+                    <div class="container d-flex justify-content-center">
+                        <form method="post" action="{{ url_for('tweets.deleteAccounts', hidden=1, active=1) }}">
+                            <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                            <a class="btn btn-success"
+                               href="{{ url_for('tweets.download', filename='search_blocked_accounts', hidden=1, active=1) }}">Download
+                                All</a>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="accounts-list mt-3 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+                <h3 class="text-center text-danger">Suspended Accounts List</h3>
+                <div class="accounts-list-body">
+                    {% if not accounts_counters['Suspended'] %}
+                        <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                            No Locked Accounts
+                        </div>
+                    {% else %}
+                        <table class="table table-hover table-sm">
+                            <thead class="bg-white shadow-sm rounded-3">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Permission</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, account_info in suspended_accounts %}
+                                <tr class="align-middle">
+                                    <form method="post"
+                                          action="{{ url_for('tweets.deleteAccount', account_id=account_info['id']) }}">
+                                        <th scope="row">{{ index + 1 }}</th>
+                                        <td>{{ account_info['username'] }}</td>
+                                        <td>{{ account_info['account_type'] }}</td>
+                                        <td><input value="Delete" type="submit" class="btn btn-danger"/></td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                {% if accounts_counters['Suspended'] %}
+                    <div class="container d-flex justify-content-center">
+                        <form method="post" action="{{ url_for('tweets.deleteAccounts', suspended=1) }}">
+                            <input class="btn btn-danger" type="submit" value="Delete All" name="delete_all"/>
+                            <a class="btn btn-success"
+                               href="{{ url_for('tweets.download', filename='suspended_accounts', suspended=1) }}">Download
+                                All</a>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(function () {
+            const accounts_list = $('.accounts-list');
+            $('.accounts-list-body').toggle();
+            accounts_list.find('h3').on('click', function () {
+                $(this).parent().find('div').first().toggle(100)
+            });
+            $('#tweet-text').val(`{{ settings.fixed_tweet_string.strip() if settings.fixed_tweet_string else '' }}`);
+            $('#tweet-alt-text').val('{{ settings.tweet_alt_text.strip() if settings.tweet_alt_text else '' }}');
+        })
+    </script>
+{% endblock %}

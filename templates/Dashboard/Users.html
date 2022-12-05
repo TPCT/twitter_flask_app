@@ -1,0 +1,87 @@
+{% extends "Dashboard/Base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/dashboard/dashboard.css"/>
+{% endblock %}
+
+{% block main %}
+    <div class="row mb-3 d-flex justify-content-center flex-wrap">
+        <div class="col">
+            <div class="d-flex flex-column justify-content-center flex-wrap shadow-sm rounded-3 bg-light border p-2">
+                <h4>Users IN Database</h4>
+                <div class="row p-3">
+                    <div class="col bg-white rounded-3 shadow-sm p-2 border">
+                        <h6 class="text-center">Users To Be Add</h6>
+                        <form class="d-flex flex-column align-items-center justify-content-start" method="post"
+                              action="{{ url_for('users.store') }}">
+                            {{ users_store_form.hidden_tag() }}
+                            <div class="w-100 p-3">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    {{ users_store_form.username(class_='form-control', id='username') }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    {{ users_store_form.password(class_='form-control', id='password') }}
+                                </div>
+                                <div class="form-check form-switch ms-2">
+                                    {{ users_store_form.is_admin(class_='form-check-input', role='switch', id='is_admin') }}
+                                    <label class="form-check-label"
+                                           for="is_admin">admin</label>
+                                </div>
+                            </div>
+                            {{ users_store_form.save(class="btn btn-success btn-sm m-2") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accounts-list col me-2 shadow-sm d-flex flex-column p-3 h-100 border rounded-3">
+            <h3>Users</h3>
+            <div class="accounts-list-body mb-3">
+                {% if not users %}
+                    <div class="text-center h-100 w-100 justify-content-center align-items-center">
+                        No Active Users
+                    </div>
+                {% else %}
+                    <table class="table table-hover table-sm">
+                        <thead class="bg-white shadow-sm rounded-3">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for index, user_info in users %}
+                            {% if user_info['username'] %}
+                                <tr class="align-middle">
+                                    <th scope="row">{{ index + 1 }}</th>
+                                    <td>{{ user_info['username'] }}</td>
+                                    <td>
+                                        <form method="post"
+                                              action="{{ url_for('users.delete', account_id=user_info['id']) }}">
+                                            <input type="submit" class="btn btn-danger" value="Delete"/>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(function () {
+            const accounts_list = $('.accounts-list');
+            $('.accounts-list-body').toggle();
+            accounts_list.find('h3').on('click', function () {
+                $(this).parent().find('div').first().toggle(100)
+            });
+        })
+    </script>
+{% endblock %}
